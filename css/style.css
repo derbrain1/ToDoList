@@ -1,0 +1,153 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Roboto', 'Open Sans', 'Segoe UI', Tahoma, sans-serif;
+}
+body {
+  background: #d9f0ff; 
+  color: #222; 
+}
+header {
+  background: #006ddb; 
+  color: #fff;
+  padding: 18px 0;
+  font-size: 2.4rem;
+  font-weight: bold;
+  text-align: left;
+}
+header .container {
+  padding: 0 32px;
+}
+
+.container {
+  max-width: 1380px;
+  margin: 0 auto;
+  padding: 28px;
+}
+.add-section {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 22px;
+  margin-bottom: 28px;
+  width: 29rem;
+}
+.add-section h2 {
+  font-size: 1.8rem;
+  margin-bottom: 15px;
+  font-weight: 600;
+}
+.input-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+.input-field {
+  flex: 1;
+  padding: 12px 16px;
+  border: 1px solid #b0b0b0; 
+  border-radius: 8px;
+  font-size: 1rem;
+  outline: none;
+}
+.input-field::placeholder {
+  color: #777; 
+}
+.btn-add {
+  background: #006ddb;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 22px;
+  font-size: 1rem;
+  cursor: pointer;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.boards {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 19px;
+  margin-top: 20px;
+}
+.backlog-column,
+.progress-column,
+.done-column,
+.trash-column {
+  background: none;
+}
+
+.title {
+  font-size: 1rem;
+  font-weight: 600;
+  padding: 7px 12px;
+  border-radius: 8px;
+  margin-bottom: 12px;
+  text-align: center;
+  width: fit-content;
+  display: inline-block;
+}
+
+.backlog .title {
+  background: #b0b0b0; 
+  color: #1f1f1f;
+}
+.progress .title {
+  background: #93bbff; 
+  color: #1b3a8a;
+}
+.done .title {
+  background: #b6e2b6; 
+  color: #1d5e1d;
+}
+.trash .title {
+  background: #f6c6c6; 
+  color: #802020;
+}
+
+.list {
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
+  background: none;
+}
+.task {
+  background: white;
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin-bottom: 7px;
+  transition: transform 0.2s ease;
+  border-left: 6px solid transparent;
+}
+
+.backlog .task {
+  border-left: 6px solid #b0b0b0;
+}
+.progress .task {
+  border-left: 6px solid #93bbff;
+}
+.done .task {
+  border-left: 6px solid #b6e2b6;
+}
+.trash .task {
+  border-left: 6px solid #f6c6c6;
+}
+
+.btn-clear {
+  background: #802020; 
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 22px;
+  font-size: 1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 10px;
+  width: 100%;
+}

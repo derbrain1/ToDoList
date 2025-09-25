@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title></title>
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
+    <header>
+      <div class="container">Список задач</div>
+    </header>
+    <main class="container">
+      <div class="add-section">
+        <h2>Новая задача</h2>
+        <div class="input-row">
+          <label>
+            <input type="text" class="input-field" placeholder="Название задачи..." />
+          </label>
+          <button class="btn-add">Добавить</button>
+        </div>
+      </div>
+      <div class="boards">
+        <div class="backlog backlog-column">
+          <div class="title backlog">Бэклог</div>
+          <ul class="list backlog-list">
+            <li class="task backlog-task">Выучить JS</li>
+            <li class="task backlog-task">Выучить React</li>
+            <li class="task backlog-task">Сделать домашку</li>
+          </ul>
+        </div>
+        <div class="progress progress-column">
+          <div class="title progress">В процессе</div>
+          <ul class="list progress-list">
+            <li class="task progress-task">Выпить смузи</li>
+            <li class="task progress-task">Попить воды</li>
+          </ul>
+        </div>
+        <div class="done done-column">
+          <div class="title done">Готово</div>
+          <ul class="list done-list">
+            <li class="task done-task">Позвонить маме</li>
+            <li class="task done-task">Погладить кота</li>
+          </ul>
+        </div>
+        <div class="trash trash-column">
+          <div class="title trash">Корзина</div>
+          <ul class="list trash-list">
+            <li class="task trash-task">Сходить погулять</li>
+            <li class="task trash-task">Прочитать Войну и Мир</li>
+          </ul>
+          <button class="btn-clear">Очистить</button>
+        </div>
+      </div>
+    </main>
+  </body>
+</html>
