@@ -1,11 +1,10 @@
 import {createElement} from '../framework/render.js';
 
-function createListTaskComponentTemplate() {
+function createListTaskComponentTemplate(status, name) {
     return (
-    ` <div class="backlog backlog-column">
-          <div class="title backlog">Название блока</div>
-            <ul class="list backlog-list">
-            
+    ` <div class="${status} ${status}-column">
+          <div class="title ${status}">${name}</div>
+            <ul class="list ${status}-list">
             </ul>
         </div>
         `
@@ -13,8 +12,12 @@ function createListTaskComponentTemplate() {
 }
 
 export default class ListTaskComponent {
+    constructor(status,name) {
+        this.status = status;
+        this.name = name;
+    }
     getTemplate() {
-    return createListTaskComponentTemplate();
+    return createListTaskComponentTemplate(this.status, this.name);
     }
     getElement() {
     if (!this.element) {
