@@ -30,9 +30,7 @@ init(){
 
     render(this.#tasksBoardComponent, this.#boardContainer);
     for (let i = 0; i < status.length; i++) {
-    console.log(status[i], statusLabel[status[i]]);
     const listTaskComponent = new ListTaskComponent(status[i], statusLabel[status[i]]); 
-    console.log(listTaskComponent.status);
     this.#renderTaskList(listTaskComponent, this.#tasksBoardComponent.element);
     let filterTaskList=this.#boardTasks.filter(task => task.status === status[i]);
     if (filterTaskList.length == 0){
