@@ -7,14 +7,24 @@ import TaskBoardPresenter from './presenter/tasks-board-presenter.js';
 const bodyContainer = document.querySelector('.board-app');
 const formContainer = document.querySelector('.add-section');
 
-render(new HeaderComponent(), bodyContainer, RenderPosition.BEFOREBEGIN);
-render(new FormAddTaskComponent(), formContainer);
+
 const boardContainer = document.querySelector('.board');
 const taskModel = new TaskModel();
 const taskBoardPresenter = new TaskBoardPresenter(
   boardContainer,
   taskModel,);
 
+
+const formAddTaskComponent = new FormAddTaskComponent({
+  onClick: handleNewTaskButtonClick
+});
+
+function handleNewTaskButtonClick() {
+  taskBoardPresenter.createTask();
+}
+
+render(new HeaderComponent(), bodyContainer, RenderPosition.BEFOREBEGIN);
+render(formAddTaskComponent, formContainer);
 taskBoardPresenter.init();
 
 

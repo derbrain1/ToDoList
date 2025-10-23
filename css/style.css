@@ -161,3 +161,15 @@ header .container {
   margin-top: 10px;
   width: 100%;
 }
+
+.btn-clear:disabled {
+  opacity: 0.5;              
+  cursor: default;          
+  pointer-events: none;      
+  filter: grayscale(20%);   
+}
+
+.btn-clear:disabled:hover {
+  background: #802020;     
+  color: white;
+}

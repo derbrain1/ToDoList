@@ -19,7 +19,6 @@ export default class ListTaskComponent extends AbstractComponent{
         this.name = name;
     }
     get template() {
-        console.log(this.status);
     return createListTaskComponentTemplate(this.status, this.name);
     }
     
