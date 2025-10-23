@@ -107,6 +107,16 @@ header .container {
   background: #f6c6c6; 
   color: #802020;
 }
+.no-task {
+  color: rgba(0, 0, 0, 0.5);         
+  background: rgba(0, 0, 0, 0.04);
+  border: 1px solid rgba(0, 0, 0, 0.08); 
+  border-radius: 12px;
+  padding: 10px 12px;
+  font-size: 14px;
+  line-height: 1.4;  
+  display: block;
+}
 
 .list {
   list-style: none;
