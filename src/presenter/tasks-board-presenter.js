@@ -5,7 +5,8 @@ import ClearButtonComponent from '../view/clear-button-component.js';
 import NoTaskComponent from '../view/no-task-component.js';
 import {render} from '../framework/render.js';
 import {status, statusLabel} from "../constants/status.js";
-
+import { UserAction, UpdateType  } from '../constants/const.js';
+import LoadingViewComponent from '../view/LoadingViewComponent.js';
 
 export default class TaskBoardPresenter {
     #tasksBoardComponent=new BoardComponent();
@@ -21,10 +22,15 @@ export default class TaskBoardPresenter {
         
     }
 
-
-init(){
-    this.#renderBoard();
-}
+async init() {
+  const loadingComponent = new LoadingViewComponent();
+  loadingComponent.removeElement();
+  render(loadingComponent, this.#boardContainer);
+  await this.#tasksModel.init();
+  this.#boardContainer.innerHTML = '';
+  this.#clearBoard();
+  this.#renderBoard();
+ }
 
 #renderBoard() {
 
@@ -34,10 +40,15 @@ init(){
 
     #renderClearButton(container) {
         const clearButtonComponent = new ClearButtonComponent({
-            onClick: () => {
+            onClick: async () => {
         
             if (this.tasks.every(t => t.status !== 'trash')) return;
-            this.#tasksModel.clearTrash();
+            try{
+              await this.#tasksModel.clearTrash();
+            }catch (err) {
+              console.error('Ошибка при очистке корзины:', err);
+            }
+            
             }
         });
 
@@ -80,25 +91,32 @@ init(){
     }
   });
 }
-
-    #handleTaskDrop(taskId, newStatus, insertIndex) {
-        this.#tasksModel.updateTaskStatus(taskId, newStatus, insertIndex);
+  
+  async #handleTaskDrop(taskId, newStatus, insertionIndex) {
+    try {
+      await this.#tasksModel.updateTaskStatus(taskId, newStatus, insertionIndex);
+    } catch (err) {
+      console.error('Ошибка при обновлении статуса задачи:', err);
     }
-
+  }
+  
     #renderNoTask(component, container){
         render(component, container);
     }
 
-    createTask() {
+    async createTask() {
     const taskTitle = document.querySelector('input[name="title"]').value.trim();
     if (!taskTitle) {
       return;
     }
-
-    this.#tasksModel.addTask(taskTitle);
-
-    document.querySelector('input[name="title"]').value = '';
+    try {
+      await this.#tasksModel.addTask(taskTitle);
+      document.querySelector('input[name="title"]').value = '';
+    } catch (err) {
+      console.error('Ощибка при создании задачи:', err)
     }
+  }
+
 
     get tasks() {
         return this.#tasksModel.tasks;
@@ -109,12 +127,16 @@ init(){
   }
 
 
-    #handleModelChange() {
+    #handleModelChange(event, payload) {
+    switch (event) {
+      case UserAction.ADD_TASK:
+      case UserAction.UPDATE_TASK:
+      case UserAction.DELETE_TASK:
         this.#clearBoard();
         this.#renderBoard();
+        break;
     }
-  
-
+  }
 }
 
 

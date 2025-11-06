@@ -1,9 +1,34 @@
-import { tasks } from '../mock/task.js';
+import Observable from '../framework/observable.js';
 import { generateID } from '../utils.js';
+import { UserAction, UpdateType } from '../constants/const.js';
 
-export default class TaskModel {
-  #boardTasks = tasks;
-  #observers = [];
+export default class TaskModel extends Observable{
+
+  
+  #tasksApiService = null;
+  #boardTasks = [];
+
+
+ constructor({tasksApiService}) {
+  super();
+  this.#tasksApiService = tasksApiService;
+
+
+  this.#tasksApiService.tasks.then((tasks) => {
+     console.log(tasks);
+   });
+ }
+  
+
+  async init() {
+   try {
+     const tasks = await this.#tasksApiService.tasks;
+     this.#boardTasks = tasks;
+   } catch(err) {
+     this.#boardTasks = [];
+   }
+   this._notify(UpdateType.INIT);
+  }
 
   get tasks() {
     return this.#boardTasks;
@@ -13,55 +38,89 @@ export default class TaskModel {
     return this.#boardTasks.filter(task => task.status === status);
   }
 
-  addTask(title) {
-    const newTask = {
-      title,
-      status: 'backlog',
-      id: generateID(),
-    };
-    this.#boardTasks.push(newTask);
-    this._notifyObservers();
-    return newTask;
+  async addTask(title) {
+   const newTask = {
+     title,
+     status: 'backlog',
+     id: generateID(),
+   };
+   try {
+     const createdTask = await this.#tasksApiService.addTask(newTask);
+     this.#boardTasks.push(createdTask);
+     this._notify(UserAction.ADD_TASK, createdTask);
+     return createdTask;
+   } catch (err) {
+     console.error('Ошибка при добавлении задачи на сервер:', err);
+     throw err;
+   }
+ }
+
+  deleteTask(taskId){
+    this.#boardTasks = this.#boardTasks.filter(task => task.id !== taskId);
+    this._notify(UserAction.DELETE_TASK, {id: taskId});
   }
 
-  clearTrash() {
-    this.#boardTasks = this.#boardTasks.filter(task => task.status !== 'trash');
-    this._notifyObservers();
-  }
+  async clearTrash() {
+    const trashTasks = this.#boardTasks.filter(task => task.status === 'trash');
 
-  addObserver(observer) {
-    this.#observers.push(observer);
-  }
+    try {
+      await Promise.all(trashTasks.map(task => this.#tasksApiService.deleteTask(task.id)));
 
-  removeObserver(observer) {
-    this.#observers = this.#observers.filter((obs) => obs !== observer);
-  }
-
-  updateTaskStatus(taskId, newStatus, insertionIndex) {
-  const id = String(taskId);
-  const fromIdx = this.#boardTasks.findIndex(t => String(t.id) === id);
-  if (fromIdx < 0) return;
-
-  const [task] = this.#boardTasks.splice(fromIdx, 1);
-  task.status = newStatus;
-
-  const positions = [];
-  for (let i = 0; i < this.#boardTasks.length; i++) {
-    if (this.#boardTasks[i].status === newStatus) positions.push(i);
-  }
-
-  let absolute = this.#boardTasks.length;
-  if (positions.length > 0) {
-    const first = positions[0];
-    const rel = Math.max(0, Math.min(insertionIndex, positions.length));
-    absolute = first + rel;
-  }
-
-  this.#boardTasks.splice(absolute, 0, task);
-  this._notifyObservers?.();
-}
-
-  _notifyObservers() {
-      this.#observers.forEach((observer) => observer());
+      this.#boardTasks = this.#boardTasks.filter(task => task.status !== 'trash');
+      this._notify(UserAction.DELETE_TASK, { status: 'bin' });
+    } catch (err) {
+      console.error('Ошибка при удалении задач из корзины на сервере:', err);
+      throw err;
     }
   }
+
+  async updateTaskStatus(taskId, newStatus, targetIndex) {
+    const oldIndex = this.#boardTasks.findIndex(t => String(t.id) === String(taskId));
+    if (oldIndex === -1) return;
+
+    const task = this.#boardTasks[oldIndex];
+    const prevStatus = task.status;
+    this.#boardTasks.splice(oldIndex, 1);
+
+    const indices = [];
+    for (let i = 0; i < this.#boardTasks.length; i++) {
+      const t = this.#boardTasks[i];
+      if (t.status === newStatus) indices.push(i);
+    }
+
+    let pos = 0;
+    if (typeof targetIndex !== 'number') {
+      pos = indices.length; 
+    } else {
+      if (targetIndex < 0) pos = 0;
+      else if (targetIndex > indices.length) pos = indices.length;
+      else pos = targetIndex;
+    }
+
+    let insertAt;
+    if (indices.length === 0) {
+      insertAt = this.#boardTasks.length;
+    } else {
+      if (pos === indices.length) insertAt = indices[indices.length - 1] + 1;
+      else insertAt = indices[pos];
+    }
+
+    task.status = newStatus;
+    this.#boardTasks.splice(insertAt, 0, task);
+    this._notify(UserAction.UPDATE_TASK, { id: task.id, status: newStatus, index: insertAt });
+
+    try {
+      const updated = await this.#tasksApiService.updateTask(task);
+      Object.assign(task, updated);
+    } catch (err) {
+      console.error('Ошибка при обновлении статуса задачи на сервере:', err);
+      const nowIndex = this.#boardTasks.findIndex(t => String(t.id) === String(task.id));
+      if (nowIndex !== -1) this.#boardTasks.splice(nowIndex, 1);
+      task.status = prevStatus;
+      this.#boardTasks.splice(oldIndex, 0, task);
+      this._notify(UserAction.UPDATE_TASK, { id: task.id, status: prevStatus, index: oldIndex });
+      throw err;
+    }
+  }
+
+}
