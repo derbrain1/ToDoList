@@ -67,7 +67,7 @@ export default class TaskModel extends Observable{
       await Promise.all(trashTasks.map(task => this.#tasksApiService.deleteTask(task.id)));
 
       this.#boardTasks = this.#boardTasks.filter(task => task.status !== 'trash');
-      this._notify(UserAction.DELETE_TASK, { status: 'bin' });
+      this._notify(UserAction.DELETE_TASK, { status: 'trash' });
     } catch (err) {
       console.error('Ошибка при удалении задач из корзины на сервере:', err);
       throw err;
