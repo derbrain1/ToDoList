@@ -37,7 +37,31 @@ export default class TaskModel {
     this.#observers = this.#observers.filter((obs) => obs !== observer);
   }
 
-  _notifyObservers() {
-    this.#observers.forEach((observer) => observer());
+  updateTaskStatus(taskId, newStatus, insertionIndex) {
+  const id = String(taskId);
+  const fromIdx = this.#boardTasks.findIndex(t => String(t.id) === id);
+  if (fromIdx < 0) return;
+
+  const [task] = this.#boardTasks.splice(fromIdx, 1);
+  task.status = newStatus;
+
+  const positions = [];
+  for (let i = 0; i < this.#boardTasks.length; i++) {
+    if (this.#boardTasks[i].status === newStatus) positions.push(i);
   }
+
+  let absolute = this.#boardTasks.length;
+  if (positions.length > 0) {
+    const first = positions[0];
+    const rel = Math.max(0, Math.min(insertionIndex, positions.length));
+    absolute = first + rel;
+  }
+
+  this.#boardTasks.splice(absolute, 0, task);
+  this._notifyObservers?.();
 }
+
+  _notifyObservers() {
+      this.#observers.forEach((observer) => observer());
+    }
+  }

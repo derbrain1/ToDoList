@@ -29,26 +29,8 @@ init(){
 #renderBoard() {
 
     this.#boardTasks=[...this.tasks];
-   
     render(this.#tasksBoardComponent, this.#boardContainer);
-    for (let i = 0; i < status.length; i++) {
-    const listTaskComponent = new ListTaskComponent(status[i], statusLabel[status[i]]); 
-    this.#renderTaskList(listTaskComponent, this.#tasksBoardComponent.element);
-    let filterTaskList=this.#boardTasks.filter(task => task.status === status[i]);
-    if (filterTaskList.length == 0){
-        this.#renderNoTask(new NoTaskComponent(), listTaskComponent.element.querySelector("ul"));
-    }
-    else{
-        for (let j = 0; j < filterTaskList.length; j++) {
-        const taskComponent = new TaskComponent(filterTaskList[j].title,filterTaskList[j].status); 
-        this.#renderTask(taskComponent, listTaskComponent.element.querySelector("ul"));}
-    }
-    
-    if(status[i] === "trash") {
-        this.#renderClearButton(listTaskComponent.element);
-        }
-    }
-}
+    this.#renderTaskList();}
 
     #renderClearButton(container) {
         const clearButtonComponent = new ClearButtonComponent({
@@ -68,10 +50,41 @@ init(){
 
         render(task, container);
     }
-    #renderTaskList(listTaskComponent, container){
-        render(listTaskComponent, container);
+   #renderInColumn(listTaskComponent, container){
+  render(listTaskComponent, container);
+}
+
+#renderTaskList(){
+  status.forEach((st) => {
+    const taskListComponent = new ListTaskComponent({
+      status: st,
+      name: statusLabel[st],
+      onTaskDrop: this.#handleTaskDrop.bind(this)
+    });
+    this.#renderInColumn(taskListComponent, this.#tasksBoardComponent.element);
+
+    const ul = taskListComponent.element.querySelector('ul');
+    const filterTaskList = this.#boardTasks.filter(task => task.status === st);
+
+    if (filterTaskList.length === 0) {
+      this.#renderNoTask(new NoTaskComponent(), ul);
+    } else {
+      filterTaskList.forEach((t) => {
+        const taskComponent = new TaskComponent(t); 
+        this.#renderTask(taskComponent, ul);
+      });
     }
-    
+
+    if (st === 'trash') {
+      this.#renderClearButton(taskListComponent.element);
+    }
+  });
+}
+
+    #handleTaskDrop(taskId, newStatus, insertIndex) {
+        this.#tasksModel.updateTaskStatus(taskId, newStatus, insertIndex);
+    }
+
     #renderNoTask(component, container){
         render(component, container);
     }
